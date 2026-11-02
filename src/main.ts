@@ -1,5 +1,6 @@
 import './style.css';
 import { applyTheme, bestScore, type CarnivalGame } from './carnival';
+import { issueRepo, newIssueLink } from './feedback';
 import { registry } from './games';
 import { startMidway } from './midway/midway';
 import type { BoothSlot } from './midway/world';
@@ -9,6 +10,25 @@ applyTheme();
 
 const app = document.querySelector<HTMLElement>('#app')!;
 let stop: (() => void) | undefined;
+let current: CarnivalGame | undefined;
+
+// The report button floats over every view, so it lives outside #app. Its link
+// is built on click, so the issue gets the app context as it is right then.
+const report = document.createElement('a');
+report.className = 'report-issue';
+report.target = '_blank';
+report.rel = 'noopener';
+report.textContent = 'Report an issue';
+report.href = issueRepo(location.href);
+report.addEventListener('click', () => {
+  report.href = newIssueLink(issueRepo(location.href), {
+    href: location.href,
+    game: current && { id: current.id, name: current.name, best: bestScore(current.id) },
+    userAgent: navigator.userAgent,
+    viewport: { width: window.innerWidth, height: window.innerHeight },
+  });
+});
+document.body.append(report);
 
 function bestText(game: CarnivalGame): string {
   const best = bestScore(game.id);
@@ -110,6 +130,7 @@ function route() {
 
   const match = location.hash.match(/^#\/play\/([\w-]+)$/);
   const game = match ? registry.get(match[1]) : undefined;
+  current = game;
   if (game) renderGame(game);
   else renderMidway();
 }

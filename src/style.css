@@ -245,6 +245,27 @@ kbd {
   display: none;
 }
 
+.report-issue {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 10;
+  padding: 10px 16px;
+  border: 2px solid var(--color-background);
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-background);
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-background) 60%, transparent);
+}
+
+.report-issue:hover,
+.report-issue:focus-visible {
+  text-decoration: underline;
+}
+
 @media (max-width: 720px) {
   .midway-help,
   .midway-credit {
