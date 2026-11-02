@@ -46,6 +46,7 @@ export type PropKind =
   | 'ticket-booth'
   | 'bench'
   | 'planter'
+  | 'flowers'
   | 'balloons'
   | 'bunting-pole'
   | 'billboard';
@@ -212,6 +213,9 @@ export function layoutMidway(gameIds: readonly string[]): MidwayMap {
   add('balloons', 22, entrance + 4);
   add('planter', 15, entrance);
   add('planter', 1, height - 2);
+  // Flower beds either side of the plaza in front of the gate.
+  add('flowers', AVENUE_X - 5, height - 2, 2, 1);
+  add('flowers', AVENUE_X + 5, height - 2, 2, 1, 1);
 
   return {
     width,
