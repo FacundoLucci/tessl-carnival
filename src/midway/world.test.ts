@@ -83,6 +83,15 @@ describe('layoutMidway', () => {
     }
   });
 
+  it('plants flowers either side of the gate', () => {
+    const map = layoutMidway(['water-cannon']);
+    const beds = map.props.filter((prop) => prop.kind === 'flowers');
+    expect(beds).toHaveLength(2);
+    for (const bed of beds) expect(bed.y).toBe(map.height - 2);
+    expect(beds.some((bed) => bed.x + bed.w <= map.avenueX)).toBe(true);
+    expect(beds.some((bed) => bed.x > map.avenueX + 1)).toBe(true);
+  });
+
   it('is the same on every visit', () => {
     expect(layoutMidway(['a'])).toEqual(layoutMidway(['a']));
   });

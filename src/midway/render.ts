@@ -3,6 +3,7 @@ import bannerUrl from './aidevcon-banner.png';
 import { palette } from './palette';
 import {
   CART_KINDS,
+  seededRandom,
   toScreen,
   type BoothSlot,
   type MidwayMap,
@@ -1064,6 +1065,37 @@ function planter(ctx: Ctx, prop: Prop) {
   oval(ctx, c[0], c[1] - 17, 5, 5, palette.hedgeLight);
 }
 
+const FLOWER_COLORS = [palette.red, palette.gold, palette.pink, palette.cream, palette.blue];
+
+function flowers(ctx: Ctx, prop: Prop) {
+  box(
+    ctx,
+    prop.x + 0.1,
+    prop.y + 0.15,
+    prop.w - 0.2,
+    prop.h - 0.3,
+    0,
+    3,
+    palette.woodDark,
+    palette.wood,
+    palette.woodDark,
+  );
+  // Blossoms in rows from the back so the front ones sit on top.
+  const random = seededRandom(prop.x * 31 + prop.y * 7 + prop.variant);
+  const across = prop.w * 4;
+  for (let row = 0; row < 3; row++) {
+    for (let i = 0; i < across; i++) {
+      const fx = prop.x + 0.2 + ((i + random() * 0.6) / across) * (prop.w - 0.4);
+      const fy = prop.y + 0.25 + row * 0.22 + random() * 0.08;
+      const p = at(fx, fy, 6 + random() * 3);
+      oval(ctx, p[0], p[1] + 2, 2.6, 2, palette.hedgeDark);
+      const color = FLOWER_COLORS[Math.floor(random() * FLOWER_COLORS.length)];
+      oval(ctx, p[0], p[1], 2.2, 1.8, color);
+      oval(ctx, p[0], p[1] - 0.3, 0.8, 0.7, palette.goldShade);
+    }
+  }
+}
+
 function balloons(ctx: Ctx, prop: Prop, t: number) {
   const c = at(prop.x + 0.5, prop.y + 0.5);
   oval(ctx, c[0] + 2, c[1] + 1, 5, 2, palette.shadow);
@@ -1569,6 +1601,7 @@ const PROP_HEIGHTS: Record<Prop['kind'], number> = {
   'ticket-booth': 46,
   bench: 16,
   planter: 22,
+  flowers: 12,
   balloons: 52,
   'bunting-pole': 0,
   billboard: BILLBOARD_HEIGHT + 40,
@@ -1768,6 +1801,8 @@ export function drawProp(ctx: Ctx, prop: Prop, t: number) {
       return bench(ctx, prop);
     case 'planter':
       return planter(ctx, prop);
+    case 'flowers':
+      return flowers(ctx, prop);
     case 'balloons':
       return balloons(ctx, prop, t);
     case 'bunting-pole':
