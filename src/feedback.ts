@@ -14,12 +14,15 @@ export interface AppContext {
  * https://<owner>.github.io/<repo>/ comes from github.com/<owner>/<repo>, so
  * each fork's issues go to that fork. Anywhere else, such as a local dev
  * server, there is no way to tell, so issues go to the original carnival.
+ * A user site at https://<owner>.github.io/ comes from <owner>.github.io.
  */
 export function issueRepo(href: string): string {
   const url = new URL(href);
   const pages = url.hostname.match(/^([\w-]+)\.github\.io$/i);
   if (!pages) return REPO_URL;
-  const repo = url.pathname.split('/').find(Boolean) ?? url.hostname;
+  // A user site's own page, such as /index.html, is a file, not a repository.
+  const first = url.pathname.split('/').find(Boolean);
+  const repo = first && !/\.html?$/i.test(first) ? first : url.hostname;
   return `https://github.com/${pages[1]}/${repo}`;
 }
 

@@ -23,6 +23,15 @@ describe('issueRepo', () => {
 
   it('handles a user site served from the root', () => {
     expect(issueRepo('https://ada.github.io/')).toBe('https://github.com/ada/ada.github.io');
+    expect(issueRepo('https://ada.github.io/index.html#/play/water-cannon')).toBe(
+      'https://github.com/ada/ada.github.io',
+    );
+  });
+
+  it('reads the fork from a project site opened at its index.html', () => {
+    expect(issueRepo('https://ada.github.io/my-carnival/index.html')).toBe(
+      'https://github.com/ada/my-carnival',
+    );
   });
 
   it('falls back to the original carnival anywhere else', () => {
