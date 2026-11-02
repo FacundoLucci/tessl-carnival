@@ -1,5 +1,6 @@
 import './style.css';
 import { applyTheme, bestScore, type CarnivalGame } from './carnival';
+import { issueRepo, newIssueLink } from './feedback';
 import { registry } from './games';
 import { startMidway } from './midway/midway';
 import type { BoothSlot } from './midway/world';
@@ -9,6 +10,29 @@ applyTheme();
 
 const app = document.querySelector<HTMLElement>('#app')!;
 let stop: (() => void) | undefined;
+let current: CarnivalGame | undefined;
+
+// The report button floats over every view, so it lives outside #app. Its link
+// is rebuilt on every route and just before any way of opening it (click,
+// middle-click, the context menu, keyboard focus), so the issue gets the app
+// context as it is right then.
+const report = document.createElement('a');
+report.className = 'report-issue';
+report.target = '_blank';
+report.rel = 'noopener';
+report.textContent = 'Report an issue';
+function refreshReport() {
+  report.href = newIssueLink(issueRepo(location.href), {
+    href: location.href,
+    game: current && { id: current.id, name: current.name, best: bestScore(current.id) },
+    userAgent: navigator.userAgent,
+    viewport: { width: window.innerWidth, height: window.innerHeight },
+  });
+}
+for (const type of ['pointerdown', 'focus', 'contextmenu', 'click']) {
+  report.addEventListener(type, refreshReport);
+}
+document.body.append(report);
 
 function bestText(game: CarnivalGame): string {
   const best = bestScore(game.id);
@@ -110,6 +134,8 @@ function route() {
 
   const match = location.hash.match(/^#\/play\/([\w-]+)$/);
   const game = match ? registry.get(match[1]) : undefined;
+  current = game;
+  refreshReport();
   if (game) renderGame(game);
   else renderMidway();
 }
